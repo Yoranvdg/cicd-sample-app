@@ -1,9 +1,9 @@
 node {
+    stage('Checkout') {
+        git branch: 'main', url: 'https://github.com/Yoranvdg/cicd-sample-app'
+    }
     stage('Preparation') {
-        catchError(buildResult: 'SUCCESS') {
-            sh 'docker stop samplerunning'
-            sh 'docker rm samplerunning'
-        }
+        sh 'docker rm -f samplerunning || true'
     }
     stage('Build & Staging') {
         echo 'Bouwen en starten op Staging (infra010)...'
@@ -11,7 +11,6 @@ node {
         sh 'docker run -d --name samplerunning -p 5050:5050 cicd-sample-app'
     }
     stage('Deploy to Production (dmz010)') {
-        echo 'Deployen naar productie webserver dmz010...'
-        sh 'ansible-playbook -i /vagrant/ansible/inventory.yml /vagrant/ansible/site.yml --limit dmz010'
+        echo 'Klaar op Staging! Productie-deployment loopt via de Control VM of Ansible playbook.'
     }
 }
